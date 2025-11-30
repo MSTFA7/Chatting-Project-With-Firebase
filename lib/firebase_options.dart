@@ -46,6 +46,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '207579616932',
     projectId: 'chatting-application-35ab6',
     authDomain: 'chatting-application-35ab6.firebaseapp.com',
+    databaseURL: 'https://chatting-application-35ab6-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'chatting-application-35ab6.firebasestorage.app',
   );
 
@@ -54,6 +55,7 @@ class DefaultFirebaseOptions {
     appId: '1:207579616932:android:8e5311a92e1d9c207f3831',
     messagingSenderId: '207579616932',
     projectId: 'chatting-application-35ab6',
+    databaseURL: 'https://chatting-application-35ab6-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'chatting-application-35ab6.firebasestorage.app',
   );
 
@@ -62,6 +64,7 @@ class DefaultFirebaseOptions {
     appId: '1:207579616932:ios:a5a2dd59226883447f3831',
     messagingSenderId: '207579616932',
     projectId: 'chatting-application-35ab6',
+    databaseURL: 'https://chatting-application-35ab6-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'chatting-application-35ab6.firebasestorage.app',
     iosBundleId: 'com.example.mobileProject',
   );
@@ -71,6 +74,7 @@ class DefaultFirebaseOptions {
     appId: '1:207579616932:ios:a5a2dd59226883447f3831',
     messagingSenderId: '207579616932',
     projectId: 'chatting-application-35ab6',
+    databaseURL: 'https://chatting-application-35ab6-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'chatting-application-35ab6.firebasestorage.app',
     iosBundleId: 'com.example.mobileProject',
   );
@@ -81,6 +85,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '207579616932',
     projectId: 'chatting-application-35ab6',
     authDomain: 'chatting-application-35ab6.firebaseapp.com',
+    databaseURL: 'https://chatting-application-35ab6-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'chatting-application-35ab6.firebasestorage.app',
   );
+
 }
