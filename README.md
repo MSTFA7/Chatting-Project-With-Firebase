@@ -76,17 +76,6 @@ lib/
 
 ---
 
-## 📸 Screenshots (Recommended to Add)
-
-It is highly recommended to add screenshots for the following:
-
-- Login screen
-- Register screen
-- Home/User list
-- Chat interface
-- Firebase Console (Auth, Firestore, Realtime DB setup proof)
-
----
 
 ## 📌 Notes
 
