@@ -24,6 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    // Ensure status is updated before disposing
     _chatService.updateOnlineStatus(false);
     super.dispose();
   }
@@ -42,6 +43,8 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.logout, color: Color(0xFFFF9800)),
             onPressed: () async {
+              // Update status before signing out
+              await _chatService.updateOnlineStatus(false);
               await authService.signOut();
             },
           ),
@@ -49,6 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Column(
         children: [
+          // User info card
           Container(
             padding: const EdgeInsets.all(16),
             decoration: const BoxDecoration(
@@ -98,6 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const Divider(height: 1, color: Color(0xFF3A3A3A)),
+          // Users list
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: _chatService.getUsers(),
@@ -127,6 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     final userData = users[index].data() as Map<String, dynamic>;
                     final userId = users[index].id;
 
+                    // Don't show current user
                     if (userId == currentUser?.uid) {
                       return const SizedBox.shrink();
                     }

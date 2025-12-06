@@ -31,14 +31,14 @@ class ChatService {
     ids.sort();
     String chatRoomId = ids.join('_');
 
-    // add message to Firestore
+    // Add message to Firestore
     await _firestore
         .collection('chat_rooms')
         .doc(chatRoomId)
         .collection('messages')
         .add(newMessage.toMap());
 
-    // update chat room metadata
+    // Update chat room metadata
     await _firestore.collection('chat_rooms').doc(chatRoomId).set({
       'users': ids,
       'lastMessage': message,
@@ -46,10 +46,11 @@ class ChatService {
       'lastMessageSender': currentUserId,
     }, SetOptions(merge: true));
 
+    // Also send typing indicator update to Realtime Database
     await updateTypingStatus(receiverId, false);
   }
 
-  // get messages from firestore
+  // Get messages from Firestore
   Stream<QuerySnapshot> getMessages(String userId, String otherUserId) {
     List<String> ids = [userId, otherUserId];
     ids.sort();
@@ -63,7 +64,7 @@ class ChatService {
         .snapshots();
   }
 
-  // get all chat rooms for current user
+  // Get all chat rooms for current user
   Stream<QuerySnapshot> getChatRooms() {
     final currentUserId = _auth.currentUser?.uid;
     if (currentUserId == null) {
@@ -77,6 +78,7 @@ class ChatService {
         .snapshots();
   }
 
+  // Realtime Database: Update typing status
   Future<void> updateTypingStatus(String receiverId, bool isTyping) async {
     final currentUserId = _auth.currentUser?.uid;
     if (currentUserId == null) return;
@@ -85,11 +87,25 @@ class ChatService {
     ids.sort();
     String chatRoomId = ids.join('_');
 
-    await _realtimeDb
-        .ref('typing_status/$chatRoomId/$currentUserId')
-        .set({'isTyping': isTyping, 'timestamp': ServerValue.timestamp});
+    try {
+      if (isTyping) {
+        await _realtimeDb
+            .ref('typing_status/$chatRoomId/$currentUserId')
+            .set({
+          'isTyping': true,
+          'timestamp': ServerValue.timestamp,
+        });
+      } else {
+        await _realtimeDb
+            .ref('typing_status/$chatRoomId/$currentUserId')
+            .remove();
+      }
+    } catch (e) {
+      print('Error updating typing status: $e');
+    }
   }
 
+  // Realtime Database: Listen to typing status
   Stream<DatabaseEvent> getTypingStatus(String otherUserId) {
     final currentUserId = _auth.currentUser?.uid;
     if (currentUserId == null) {
@@ -105,36 +121,43 @@ class ChatService {
         .onValue;
   }
 
-  // update online status
+  // Realtime Database: Update online status
   Future<void> updateOnlineStatus(bool isOnline) async {
     final currentUserId = _auth.currentUser?.uid;
     if (currentUserId == null) return;
 
-    await _realtimeDb.ref('users/$currentUserId/status').set({
-      'isOnline': isOnline,
-      'lastSeen': ServerValue.timestamp,
-    });
-
-    // set up disconnect handler
-    if (isOnline) {
-      _realtimeDb.ref('users/$currentUserId/status').onDisconnect().set({
-        'isOnline': false,
+    try {
+      await _realtimeDb.ref('users/$currentUserId/status').set({
+        'isOnline': isOnline,
         'lastSeen': ServerValue.timestamp,
       });
+
+      // Also set up disconnect handler when going online
+      if (isOnline) {
+        await _realtimeDb.ref('users/$currentUserId/status').onDisconnect().set({
+          'isOnline': false,
+          'lastSeen': ServerValue.timestamp,
+        });
+      } else {
+        // Cancel disconnect handler when going offline
+        await _realtimeDb.ref('users/$currentUserId/status').onDisconnect().cancel();
+      }
+    } catch (e) {
+      print('Error updating online status: $e');
     }
   }
 
-  // get online status
+  // Realtime Database: Get online status
   Stream<DatabaseEvent> getOnlineStatus(String userId) {
     return _realtimeDb.ref('users/$userId/status').onValue;
   }
 
-  // get all users from Firestore
+  // Get all users from Firestore
   Stream<QuerySnapshot> getUsers() {
     return _firestore.collection('users').snapshots();
   }
 
-  // get user data
+  // Get user data
   Future<DocumentSnapshot> getUserData(String userId) {
     return _firestore.collection('users').doc(userId).get();
   }
